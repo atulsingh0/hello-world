@@ -30,7 +30,7 @@ workflows:
       - say-hello
     triggers:
       - schedule:
-          cron: "*/5 0 * * *"
+          cron: "* 0 * * *"
           filters:
             branches:
               only:
