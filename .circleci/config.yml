@@ -25,13 +25,13 @@ workflows:
     jobs:
       - say-hello
 
-  schedule-hello:
-    jobs:
-      - say-hello
-    triggers:
-      - schedule:
-          cron: "* 0 * * *"
-          filters:
-            branches:
-              only:
-                - dev
+#   schedule-hello:
+#     jobs:
+#       - say-hello
+#     triggers:
+#       - schedule:
+#           cron: "* 0 * * *"
+#           filters:
+#             branches:
+#               only:
+#                 - dev
