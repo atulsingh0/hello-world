@@ -80,3 +80,8 @@ workflows:
             branches:
               only:
                 - dev
+                
+  vm_jobs:
+    jobs:
+      - machine
+      - remote_docker                
