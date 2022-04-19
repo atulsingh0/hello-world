@@ -79,7 +79,7 @@ workflows:
           filters:
             branches:
               only:
-                - dev
+                - dev1
                 
   vm_jobs:
     jobs:
