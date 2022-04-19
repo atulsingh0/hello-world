@@ -14,9 +14,9 @@ basic_docker_build: &basic_docker_build
     dockerfile=Dockerfile
     echo "FROM alpine:latest" > $dockerfile
     echo "RUN echo hello" >> $dockerfile
-    docker network ls
-    docker inspect $(docker network ls | grep -w bridge | awk '{print $1}')
-    ip route
+    # docker network ls
+    # docker inspect $(docker network ls | grep -w bridge | awk '{print $1}')
+    # ip route
     docker build -f $dockerfile --tag throwaway:$CIRCLE_BUILD_NUM .
     docker run --rm throwaway:$CIRCLE_BUILD_NUM
     
@@ -49,7 +49,7 @@ jobs:
           date
           echo 'Done sleeping.'
     environment:
-      SLEEP: 1
+      SLEEP: 6
 
   remote_docker:
     <<: *remote_docker_defaults
@@ -60,7 +60,15 @@ jobs:
       - setup_remote_docker
       - run:
           <<: *basic_docker_build
-      - run: docker version          
+      - run: docker version
+      - run: |
+          echo $SLEEP
+          date
+          sleep $SLEEP
+          date
+          echo 'Done sleeping.'
+    environment:
+      SLEEP: 3
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
