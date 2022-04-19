@@ -39,7 +39,7 @@ jobs:
   machine:
     machine: true
     steps:
-      - run ls -l /etc/system.d/resolve.conf /etc/resolve.conf
+      - run: ls -l /etc/system.d/resolve.conf /etc/resolve.conf || echo "No file exists"
       - run:
           <<: *basic_docker_build
       - run: |
@@ -54,7 +54,7 @@ jobs:
   remote_docker:
     <<: *remote_docker_defaults
     steps:
-      - run: ls -l /etc/system.d/resolve.conf /etc/resolve.conf    
+      - run: ls -l /etc/system.d/resolve.conf /etc/resolve.conf || echo "No file exists"  
       - run: which docker
       - run: docker -v
       - setup_remote_docker
