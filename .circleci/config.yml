@@ -4,6 +4,23 @@ version: 2
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
+
+remote_docker_defaults: &remote_docker_defaults
+  docker: [{image: 'docker:17.06-git'}]
+
+basic_docker_build: &basic_docker_build
+  name: "Build a really basic docker image"
+  command: |
+    dockerfile=Dockerfile
+    echo "FROM alpine:latest" > $dockerfile
+    echo "RUN echo hello" >> $dockerfile
+    docker network ls
+    docker inspect $(docker network ls | grep -w bridge | awk '{print $1}')
+    ip route
+    docker build -f $dockerfile --tag throwaway:$CIRCLE_BUILD_NUM .
+    docker run --rm throwaway:$CIRCLE_BUILD_NUM
+    
+    
 jobs:
   say-hello:
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
@@ -17,6 +34,33 @@ jobs:
       - run:
           name: "Say hello"
           command: "echo Hello, World!"
+          
+  # vm jobs
+  machine:
+    machine: true
+    steps:
+      - ls -l /etc/system.d/resolve.conf /etc/resolve.conf
+      - run:
+          <<: *basic_docker_build
+      - run: |
+          echo $SLEEP
+          date
+          sleep $SLEEP
+          date
+          echo 'Done sleeping.'
+    environment:
+      SLEEP: 1
+
+  remote_docker:
+    <<: *remote_docker_defaults
+    steps:
+      - ls -l /etc/system.d/resolve.conf /etc/resolve.conf    
+      - run: which docker
+      - run: docker -v
+      - setup_remote_docker
+      - run:
+          <<: *basic_docker_build
+      - run: docker version          
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
