@@ -89,7 +89,10 @@ workflows:
               only:
                 - dev1
                 
-  vm_jobs:
+  vm_jobs-machine:
     jobs:
       - machine
+      
+  vm_jobs-remote_docker:
+    jobs:
       - remote_docker                
