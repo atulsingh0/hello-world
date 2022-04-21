@@ -87,7 +87,7 @@ workflows:
           filters:
             branches:
               only:
-                - dev
+                - 1_dev
                 
   vm_jobs-machine:
     jobs:
