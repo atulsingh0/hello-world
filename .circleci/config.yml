@@ -21,7 +21,7 @@ jobs:
 # vm jobs          
   machine:
       machine: true
-      resource_class: small      
+      resource_class: l1.medium      
       steps:
         - run: |
             echo $SLEEP
