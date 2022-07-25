@@ -44,5 +44,5 @@ workflows:
   say-hello-workflow:
     jobs:
       - say-hello
-      - machine_dlc
+      - machine
 
