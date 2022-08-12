@@ -19,22 +19,22 @@ jobs:
           command: "echo Hello, World! How are you?"
 
 # vm jobs          
-  machine:
-      machine: true
-      resource_class: l1.medium      
-      steps:
-        - run: |
-            echo $SLEEP
-            date
-            sleep $SLEEP
-            date
-            echo 'Done sleeping.'
-        - run: |
-            echo "If Google:" && curl http://169.254.169.254/computeMetadata/v1/instance/image  -H "Metadata-Flavor: Google" 2> /dev/null
-        - run: |
-            echo "If AWS:" && curl http://169.254.169.254/latest/meta-data/instance-type 2>/dev/null            
-      environment:
-        SLEEP: 1      
+  # machine:
+  #     machine: true
+  #     resource_class: l1.medium      
+  #     steps:
+  #       - run: |
+  #           echo $SLEEP
+  #           date
+  #           sleep $SLEEP
+  #           date
+  #           echo 'Done sleeping.'
+  #       - run: |
+  #           echo "If Google:" && curl http://169.254.169.254/computeMetadata/v1/instance/image  -H "Metadata-Flavor: Google" 2> /dev/null
+  #       - run: |
+  #           echo "If AWS:" && curl http://169.254.169.254/latest/meta-data/instance-type 2>/dev/null            
+  #     environment:
+  #       SLEEP: 1      
         
 
 # Invoke jobs via workflows
@@ -44,5 +44,5 @@ workflows:
   say-hello-workflow:
     jobs:
       - say-hello
-      - machine
+      # - machine
 
