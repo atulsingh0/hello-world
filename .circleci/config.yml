@@ -1,48 +1,22 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
+description: "This uses Trufflehog to search pull requests for secrets."
+
+orbs:
+  scanner: atul/secrets-scanner-orb@dev:alpha
+
+workflows:
+  base-workflow:
+    jobs:
+      - scan-with-git-secrets
+      - scanner/scan
+
 jobs:
-  say-hello:
-    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
+  scan-with-git-secrets:
     docker:
-      - image: cimg/base:stable
-    # Add steps to the job
-    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
+      - image: cimg/base:current
     steps:
       - checkout
-      - run:
-          name: "Say hello"
-          command: "echo Hello, World! How are you?"
-
-# vm jobs          
-  # machine:
-  #     machine: true
-  #     resource_class: l1.medium      
-  #     steps:
-  #       - run: |
-  #           echo $SLEEP
-  #           date
-  #           sleep $SLEEP
-  #           date
-  #           echo 'Done sleeping.'
-  #       - run: |
-  #           echo "If Google:" && curl http://169.254.169.254/computeMetadata/v1/instance/image  -H "Metadata-Flavor: Google" 2> /dev/null
-  #       - run: |
-  #           echo "If AWS:" && curl http://169.254.169.254/latest/meta-data/instance-type 2>/dev/null            
-  #     environment:
-  #       SLEEP: 1      
-        
-
-# Invoke jobs via workflows
-# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
-workflows:
-  version: 2
-  say-hello-workflow:
-    jobs:
-      - say-hello
-      # - machine
-
+      # Run your orb's commands to validate them.
+      - scanner/git-secrets-scan
+      - scanner/trufflehog-scan
