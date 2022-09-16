@@ -10,8 +10,8 @@ workflows:
     jobs:
       - scan-with-git-secrets
       - scan-with-trufflehog
-      # - scanner/git-secrets-scan
-      # - scanner/trufflehog-scan
+      - scanner/scan-git-secrets
+      - scanner/scan-trufflehog
 
 jobs:
   scan-with-git-secrets:
