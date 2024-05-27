@@ -17,6 +17,15 @@ jobs:
       - run:
           name: "Say hello"
           command: "echo Hello, World! How are you?"
+      - run:
+          name: "Sleep for 5 sec"
+          command: "sleep 5"
+      - run:
+          name: "Get the Host/OS details"
+          command: "cat /etc/os-release"
+      - run:
+          name: "Get the running processes"
+          command: "ps -ef"          
 
 # vm jobs          
   # machine:
