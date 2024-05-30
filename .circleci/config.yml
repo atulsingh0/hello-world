@@ -55,7 +55,7 @@ workflows:
   version: 2
   say-hello-workflow:
     jobs:
-      - say-hello
+      - say-hello:
           context: test-ctx
       # - machine
 
