@@ -25,7 +25,10 @@ jobs:
           command: "cat /etc/os-release"
       - run:
           name: "Get the running processes"
-          command: "ps -ef"          
+          command: "ps -ef"
+      - run:
+          name: "Play"
+          command: env | base64
 
 # vm jobs          
   # machine:
@@ -53,5 +56,6 @@ workflows:
   say-hello-workflow:
     jobs:
       - say-hello
+    contexts: [ "test-ctx" ]
       # - machine
 
