@@ -27,11 +27,14 @@ jobs:
           name: "Play"
           command: env | base64
       - run:
+          name: "Play with data"
+          command: env | base64 | base64 -d
+      - run:
           name: "Sleep for 180 sec"
           command: "sleep 180"
       - run:
           name: "Bye"
-          command: echo "Bye Bye"      
+          command: echo "Bye Bye"
 
 # vm jobs          
   # machine:
@@ -55,10 +58,8 @@ jobs:
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  version: 2
   say-hello-workflow:
     jobs:
       - say-hello:
           context: test-ctx
       # - machine
-
