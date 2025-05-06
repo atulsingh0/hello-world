@@ -9,7 +9,7 @@ jobs:
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
     # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
     docker:
-      - image: cimg/base:stable
+      - image: alpine:edge
     # Add steps to the job
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
@@ -19,7 +19,16 @@ jobs:
           command: "echo Hello, World! How are you?"
       - run:
           name: "Get the Host/OS details"
-          command: "cat /etc/os-release"
+          command: "[ -f /etc/os-release] && cat /etc/os-release"
+      - run:
+          name: "Print Hostname"
+          command: "hash hostname && hostname"
+      - run:
+          name: "Entrypoint"
+          command: "cat /proc/1/cmdline"
+      - run:
+          name: "I am calling from"
+          command: "wget ipinfo.io && cat index.html && rm index.html"          
       - run:
           name: "Get the running processes"
           command: "ps -ef"
@@ -30,8 +39,8 @@ jobs:
           name: "Play with data"
           command: env | base64 | base64 -d
       - run:
-          name: "Sleep for 180 sec"
-          command: "sleep 180"
+          name: "Sleep for 120 sec"
+          command: "sleep 120"
       - run:
           name: "Bye"
           command: echo "Bye Bye"
