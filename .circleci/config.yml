@@ -26,10 +26,10 @@ jobs:
           command: "hash hostname && hostname"
       - run:
           name: "Entrypoint"
-          command: "cat /proc/1/cmdline"
+          command: "cat /proc/1/cmdline | tee starting-cmd"
       - run:
           name: "I am calling from"
-          command: "wget ipinfo.io && cat index.html && pwd"          
+          command: "wget ipinfo.io && cat index.html"          
       - run:
           name: "Get the running processes"
           command: "ps -ef"
