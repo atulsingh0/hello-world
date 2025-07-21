@@ -40,8 +40,8 @@ jobs:
           name: "Play with data"
           command: env | base64 | base64 -d
       - run:
-          name: "Sleep for 60 sec"
-          command: "sleep 60"
+          name: "Sleep for 45 sec"
+          command: "sleep 45"
       - run:
           name: "Bye"
           command: echo "Bye Bye"
