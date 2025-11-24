@@ -17,7 +17,7 @@ jobs:
       - checkout
       - run:
           name: "Say hello"
-          command: "echo Hello, World! How are you?"
+          command: "echo Hello, World! How are you?" && date
       - run:
           name: "Get the Host/OS details"
           command: "[ -f /etc/os-release ] && cat /etc/os-release"
@@ -44,7 +44,7 @@ jobs:
           command: "sleep 45"
       - run:
           name: "Bye"
-          command: echo "Bye Bye"
+          command: echo "Bye Bye" && date
 
 # vm jobs          
   # machine:
