@@ -2,74 +2,17 @@
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
-jobs:
-  say-hello:
-    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
-    docker:
-      - image: alpine:edge
-    resource_class: "small"
-    # Add steps to the job
-    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
-    steps:
-      - checkout
-      - run:
-          name: "Say hello"
-          command: "echo 'Hello, World! How are you?' && date"
-      - run:
-          name: "Get the Host/OS details"
-          command: "[ -f /etc/os-release ] && cat /etc/os-release"
-      - run:
-          name: "Print Hostname"
-          command: "hash hostname && hostname"
-      - run:
-          name: "Entrypoint"
-          command: "cat /proc/1/cmdline | tee starting-cmd"
-      - run:
-          name: "I am calling from"
-          command: "wget ipinfo.io && cat index.html"          
-      - run:
-          name: "Get the running processes"
-          command: "ps -ef"
-      - run:
-          name: "Play"
-          command: env | base64
-      - run:
-          name: "Play with data"
-          command: env | base64 | base64 -d
-      - run:
-          name: "Sleep for 45 sec"
-          command: "sleep 45"
-      - run:
-          name: "Bye"
-          command: "echo 'Bye Bye' && date"
-
-# vm jobs          
-  # machine:
-  #     machine: true
-  #     resource_class: l1.medium      
-  #     steps:
-  #       - run: |
-  #           echo $SLEEP
-  #           date
-  #           sleep $SLEEP
-  #           date
-  #           echo 'Done sleeping.'
-  #       - run: |
-  #           echo "If Google:" && curl http://169.254.169.254/computeMetadata/v1/instance/image  -H "Metadata-Flavor: Google" 2> /dev/null
-  #       - run: |
-  #           echo "If AWS:" && curl http://169.254.169.254/latest/meta-data/instance-type 2>/dev/null            
-  #     environment:
-  #       SLEEP: 1      
-        
-
-# Invoke jobs via workflows
-# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
-workflows:
-  say-hello-workflow:
-    jobs:
-      - say-hello:
-          context: test-ctx
-      # - machine
+  jobs:
+    test-workdir-1:
+      machine: true
+      resource_class: circleci-runner/atul-1
+      working_directory: myproject
+      steps:
+        - run: pwd
+        - run: echo "runner dir = $CIRCLE_WORKING_DIRECTORY"
+    test-workdir-2:
+      machine: true
+      resource_class: circleci-runner/atul-2
+      steps:
+        - run: pwd
+        - run: echo "runner dir = $CIRCLE_WORKING_DIRECTORY"
