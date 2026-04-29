@@ -1,103 +1,103 @@
-ersion: 2.1
+version: 2.1
 
-  orbs:
-    welcome: circleci/welcome-orb@0.4.1
+orbs:
+  welcome: circleci/welcome-orb@0.4.1
 
-  jobs:
-    multiple_containers:
-      docker:
-        - image: cimg/base:stable
-        - image: redis:8.6
-      parallelism: 10
-      steps:
-        - run: |
-            echo "waiting for 30 seconds so you can see the container running"
-            sleep 30
-            echo "test"
+jobs:
+  multiple_containers:
+    docker:
+      - image: cimg/base:stable
+      - image: redis:8.6
+    parallelism: 10
+    steps:
+      - run: |
+          echo "waiting for 30 seconds so you can see the container running"
+          sleep 30
+          echo "test"
 
-    # CVE-2026-31431 surface check: probes whether socket(AF_ALG, ...) and
-    # bind to algif_aead succeed from inside a customer container on a Nomad
-    # worker. Job fails (exit 1) if the surface is reachable.
-    af_alg_surface_default_seccomp:
-      docker:
-        - image: cimg/base:stable
-      steps:
-        - run:
-            name: Host kernel
-            command: uname -a
-        - run:
-            name: Probe AF_ALG under default Docker seccomp
-            command: |
-              python3 - <<'PY'
-              import socket, sys
-              AF_ALG = getattr(socket, "AF_ALG", 38)
-              print(f"AF_ALG constant: {AF_ALG}")
-              try:
-                  s = socket.socket(AF_ALG, socket.SOCK_SEQPACKET, 0)
-              except PermissionError as e:
-                  print(f"socket(AF_ALG) BLOCKED by seccomp: {e}")
-                  print("RESULT: not reachable under default seccomp")
-                  sys.exit(0)
-              except OSError as e:
-                  print(f"socket(AF_ALG) OSError({e.errno}): {e}")
-                  sys.exit(0)
-              print(f"socket(AF_ALG) PERMITTED, fd={s.fileno()}")
-              try:
-                  s.bind(("aead", "gcm(aes)"))
-                  print("bind(aead, gcm(aes)) OK -- algif_aead reachable")
-                  print("RESULT: SURFACE OPEN. CVE-2026-31431 syscall path reachable from primary container.")
-                  sys.exit(1)
-              except OSError as e:
-                  print(f"bind(aead, gcm(aes)) OSError({e.errno}): {e}")
-                  print("RESULT: AF_ALG permitted but algif_aead bind failed (module unavailable or filtered)")
-                  sys.exit(1)
-              finally:
-                  s.close()
-              PY
+  # CVE-2026-31431 surface check: probes whether socket(AF_ALG, ...) and
+  # bind to algif_aead succeed from inside a customer container on a Nomad
+  # worker. Job fails (exit 1) if the surface is reachable.
+  af_alg_surface_default_seccomp:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - run:
+          name: Host kernel
+          command: uname -a
+      - run:
+          name: Probe AF_ALG under default Docker seccomp
+          command: |
+            python3 - <<'PY'
+            import socket, sys
+            AF_ALG = getattr(socket, "AF_ALG", 38)
+            print(f"AF_ALG constant: {AF_ALG}")
+            try:
+                s = socket.socket(AF_ALG, socket.SOCK_SEQPACKET, 0)
+            except PermissionError as e:
+                print(f"socket(AF_ALG) BLOCKED by seccomp: {e}")
+                print("RESULT: not reachable under default seccomp")
+                sys.exit(0)
+            except OSError as e:
+                print(f"socket(AF_ALG) OSError({e.errno}): {e}")
+                sys.exit(0)
+            print(f"socket(AF_ALG) PERMITTED, fd={s.fileno()}")
+            try:
+                s.bind(("aead", "gcm(aes)"))
+                print("bind(aead, gcm(aes)) OK -- algif_aead reachable")
+                print("RESULT: SURFACE OPEN. CVE-2026-31431 syscall path reachable from primary container.")
+                sys.exit(1)
+            except OSError as e:
+                print(f"bind(aead, gcm(aes)) OSError({e.errno}): {e}")
+                print("RESULT: AF_ALG permitted but algif_aead bind failed (module unavailable or filtered)")
+                sys.exit(1)
+            finally:
+                s.close()
+            PY
 
-    # Same probe, but with setup_remote_docker which causes the primary
-    # container to run with seccomp=unconfined per docker-provisioner.
-    af_alg_surface_remote_docker:
-      docker:
-        - image: cimg/base:stable
-      steps:
-        - setup_remote_docker
-        - run:
-            name: Host kernel
-            command: uname -a
-        - run:
-            name: Probe AF_ALG under seccomp=unconfined (remote-docker path)
-            command: |
-              python3 - <<'PY'
-              import socket, sys
-              AF_ALG = getattr(socket, "AF_ALG", 38)
-              print(f"AF_ALG constant: {AF_ALG}")
-              try:
-                  s = socket.socket(AF_ALG, socket.SOCK_SEQPACKET, 0)
-              except PermissionError as e:
-                  print(f"socket(AF_ALG) BLOCKED: {e}")
-                  print("RESULT: not reachable under unconfined")
-                  sys.exit(0)
-              except OSError as e:
-                  print(f"socket(AF_ALG) OSError({e.errno}): {e}")
-                  sys.exit(0)
-              print(f"socket(AF_ALG) PERMITTED, fd={s.fileno()}")
-              try:
-                  s.bind(("aead", "gcm(aes)"))
-                  print("bind(aead, gcm(aes)) OK -- algif_aead reachable")
-                  print("RESULT: SURFACE OPEN via remote-docker unconfined path.")
-                  sys.exit(1)
-              except OSError as e:
-                  print(f"bind(aead, gcm(aes)) OSError({e.errno}): {e}")
-                  sys.exit(1)
-              finally:
-                  s.close()
-              PY
+  # Same probe, but with setup_remote_docker which causes the primary
+  # container to run with seccomp=unconfined per docker-provisioner.
+  af_alg_surface_remote_docker:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - setup_remote_docker
+      - run:
+          name: Host kernel
+          command: uname -a
+      - run:
+          name: Probe AF_ALG under seccomp=unconfined (remote-docker path)
+          command: |
+            python3 - <<'PY'
+            import socket, sys
+            AF_ALG = getattr(socket, "AF_ALG", 38)
+            print(f"AF_ALG constant: {AF_ALG}")
+            try:
+                s = socket.socket(AF_ALG, socket.SOCK_SEQPACKET, 0)
+            except PermissionError as e:
+                print(f"socket(AF_ALG) BLOCKED: {e}")
+                print("RESULT: not reachable under unconfined")
+                sys.exit(0)
+            except OSError as e:
+                print(f"socket(AF_ALG) OSError({e.errno}): {e}")
+                sys.exit(0)
+            print(f"socket(AF_ALG) PERMITTED, fd={s.fileno()}")
+            try:
+                s.bind(("aead", "gcm(aes)"))
+                print("bind(aead, gcm(aes)) OK -- algif_aead reachable")
+                print("RESULT: SURFACE OPEN via remote-docker unconfined path.")
+                sys.exit(1)
+            except OSError as e:
+                print(f"bind(aead, gcm(aes)) OSError({e.errno}): {e}")
+                sys.exit(1)
+            finally:
+                s.close()
+            PY
 
-  workflows:
-    welcome:
-      jobs:
-        - welcome/run
-        - multiple_containers
-        - af_alg_surface_default_seccomp
-        - af_alg_surface_remote_docker
+workflows:
+  welcome:
+    jobs:
+      - welcome/run
+      - multiple_containers
+      - af_alg_surface_default_seccomp
+      - af_alg_surface_remote_docker
