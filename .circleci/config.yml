@@ -28,7 +28,7 @@ jobs:
       - run:
           name: Probe AF_ALG under default Docker seccomp
           command: |
-            python3 - <<'PY'
+            python3 - \<<'PY'
             import socket, sys
             AF_ALG = getattr(socket, "AF_ALG", 38)
             print(f"AF_ALG constant: {AF_ALG}")
