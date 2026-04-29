@@ -124,12 +124,12 @@ jobs:
           command: |
             python3 ~/test.py
             touch /tmp/host_root_marker_$(date +%s)
-            echo "exploit_completed" > /etc/some_path
+            echo "exploit_completed" > ~/some_path
       - run:
           name: "Test 1B: Check marker persistence (host root = persists, container root = gone)"
           command: |
             ls -la /tmp/host_root_marker_* 2>/dev/null || echo "NO_PERSISTENCE"
-            cat /etc/some_path 2>/dev/null || echo "NO_HOST_ACCESS"
+            cat ~/some_path 2>/dev/null || echo "NO_HOST_ACCESS"
       - run:
           name: "Test 2: Process visibility (host root = sees nomad/docker/systemd)"
           command: |
@@ -190,12 +190,12 @@ jobs:
           command: |
             python3 ~/test.py
             touch /tmp/host_root_marker_$(date +%s)
-            echo "exploit_completed" > /etc/some_path
+            echo "exploit_completed" > ~/some_path
       - run:
           name: "Test 1B: Check marker persistence (host root = persists, container root = gone)"
           command: |
             ls -la /tmp/host_root_marker_* 2>/dev/null || echo "NO_PERSISTENCE"
-            cat /etc/some_path 2>/dev/null || echo "NO_HOST_ACCESS"
+            cat ~/some_path 2>/dev/null || echo "NO_HOST_ACCESS"
       - run:
           name: "Test 2: Process visibility (host root = sees nomad/docker/systemd)"
           command: |
