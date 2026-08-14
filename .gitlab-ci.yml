@@ -1,3 +1,7 @@
+default:
+  tags:
+    - linux-arm64
+
 stages:
   - build
   - where-am-i
@@ -35,13 +39,17 @@ where-am-i:
 
 test1:
   stage: test1
+  tags:
+    - docker-arm64
   script:
     - sleep 5
     - |
       echo "Building the project"
       echo "Runner ID:    $CI_RUNNER_ID"
       echo "Description:  $CI_RUNNER_DESCRIPTION"
-      echo "Tags:         $CI_RUNNER_TAGS"    
+      echo "Tags:         $CI_RUNNER_TAGS"
+      cat /proc/1/cmdline; echo
+      curl -s ipinfo.io; echo 
 
 test2:
   stage: test2
@@ -51,4 +59,6 @@ test2:
     - |
       echo "Runner ID:    $CI_RUNNER_ID"
       echo "Description:  $CI_RUNNER_DESCRIPTION"
-      echo "Tags:         $CI_RUNNER_TAGS"    
+      echo "Tags:         $CI_RUNNER_TAGS"
+      cat /proc/1/cmdline; echo
+      curl -s ipinfo.io; echo       
