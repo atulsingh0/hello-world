@@ -1,6 +1,6 @@
-default:
-  tags:
-    - linux-arm64
+# default:
+#   tags:
+#     - linux-arm64
 
 stages:
   - build
