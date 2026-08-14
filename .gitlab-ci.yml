@@ -12,7 +12,7 @@ job_build:
   stage: build
   script:
     - |
-      echo "Building the project"
+      echo "Building the project on $CI_RUNNER_ID ($CI_RUNNER_TAGS)"
       date | tee -a /tmp/gitlab-build
       hostname | tee -a /tmp/gitlab-build
       cat /etc/os-release
@@ -44,21 +44,21 @@ test1:
   script:
     - sleep 5
     - |
-      echo "Building the project"
+      echo "Building the project on $CI_RUNNER_ID ($CI_RUNNER_TAGS)"
       echo "Runner ID:    $CI_RUNNER_ID"
       echo "Description:  $CI_RUNNER_DESCRIPTION"
       echo "Tags:         $CI_RUNNER_TAGS"
       cat /proc/1/cmdline; echo
-      curl -s ipinfo.io; echo 
+      wget ipinfo.io && cat index.html; echo 
 
 test2:
   stage: test2
   script:
-    - sleep 5
-    - echo "Building the project"
+    - sleep 1
+    - echo "Building the project on $CI_RUNNER_ID ($CI_RUNNER_TAGS)"
     - |
       echo "Runner ID:    $CI_RUNNER_ID"
       echo "Description:  $CI_RUNNER_DESCRIPTION"
       echo "Tags:         $CI_RUNNER_TAGS"
       cat /proc/1/cmdline; echo
-      curl -s ipinfo.io; echo       
+      wget ipinfo.io && cat index.html; echo       
