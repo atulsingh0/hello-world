@@ -16,7 +16,6 @@ job_build:
       date | tee -a /tmp/gitlab-build
       hostname | tee -a /tmp/gitlab-build
       cat /etc/os-release
-      ps -ef
       curl -s ipinfo.io; echo 
       cat /proc/1/cmdline; echo
       echo "Runner ID:    $CI_RUNNER_ID"
