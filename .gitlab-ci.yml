@@ -26,7 +26,7 @@ where-am-i:
     - echo "Version:      $CI_RUNNER_VERSION"
     - echo "Hostname:     $(hostname)"
     - echo "User:         $(whoami)"
-    - echo "my-laptop-$(date +%s) | $CI_RUNNER_ID " >> ~/runner-proof.txt
+    - echo "my-laptop-$(date +%s)-$CI_RUNNER_ID" | tee -a ~/runner-proof.txt
     - uname -a
 
 test1:
