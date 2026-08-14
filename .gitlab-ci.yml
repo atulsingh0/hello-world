@@ -13,9 +13,11 @@ job_build:
       hostname | tee -a /tmp/gitlab-build
       cat /etc/os-release
       ps -ef
-      curl -s ipinfo.io
+      curl -s ipinfo.io; echo 
       cat /proc/1/cmdline; echo
-      cat /tmp/gitlab-build
+      echo "Runner ID:    $CI_RUNNER_ID"
+      echo "Description:  $CI_RUNNER_DESCRIPTION"
+      echo "Tags:         $CI_RUNNER_TAGS"
 
 where-am-i:
   stage: where-am-i
@@ -35,10 +37,18 @@ test1:
   stage: test1
   script:
     - sleep 5
-    - echo "Building the project"
+    - |
+      echo "Building the project"
+      echo "Runner ID:    $CI_RUNNER_ID"
+      echo "Description:  $CI_RUNNER_DESCRIPTION"
+      echo "Tags:         $CI_RUNNER_TAGS"    
 
 test2:
   stage: test2
   script:
     - sleep 5
-    - echo "Building the project"        
+    - echo "Building the project"
+    - |
+      echo "Runner ID:    $CI_RUNNER_ID"
+      echo "Description:  $CI_RUNNER_DESCRIPTION"
+      echo "Tags:         $CI_RUNNER_TAGS"    
