@@ -6,10 +6,17 @@ job_build:
   stage: build
   script:
     - echo "Building the project"
-    - date >> /tmp/gitlab-build
+    - date | tee -a /tmp/gitlab-build
+    - hostname | tee -a /tmp/gitlab-build
+    - [ -f /etc/os-release ] && cat /etc/os-release
+    - ps -ef
+    - curl -s ipinfo.io
+    - cat /tmp/gitlab-build
+
 
 job_test:
   stage: test
   script:
     - echo "Running tests"
     - echo "---------------" >> /tmp/gitlab-build
+    - cat /tmp/gitlab-build
