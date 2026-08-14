@@ -1,6 +1,6 @@
 stages:
   - build
-  - test
+  - where-am-i
 
 job_build:
   stage: build
@@ -14,10 +14,15 @@ job_build:
     - cat /proc/1/cmdline
     - cat /tmp/gitlab-build
 
-
-job_test:
-  stage: test
+where-am-i:
+  tags:
+    - local                    # must match a tag on your runner
   script:
-    - echo "Running tests"
-    - echo "---------------" >> /tmp/gitlab-build
-    - cat /tmp/gitlab-build
+    - echo "Runner ID:    $CI_RUNNER_ID"
+    - echo "Description:  $CI_RUNNER_DESCRIPTION"
+    - echo "Tags:         $CI_RUNNER_TAGS"
+    - echo "Version:      $CI_RUNNER_VERSION"
+    - echo "Hostname:     $(hostname)"
+    - echo "User:         $(whoami)"
+    - echo "my-laptop-$(date +%s) | $CI_RUNNER_ID " >> ~/runner-proof.txt
+    - uname -a
