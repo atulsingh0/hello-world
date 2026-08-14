@@ -7,6 +7,7 @@ stages:
   - where-am-i
   - test1
   - test2 
+  - k8s-build
 
 job_build:
   stage: build
@@ -27,6 +28,7 @@ where-am-i:
   stage: where-am-i
   tags:
     - linux-arm64
+  needs: []  
   script:
     - |
       echo "Runner ID:    $CI_RUNNER_ID"
@@ -61,4 +63,33 @@ test2:
       echo "Description:  $CI_RUNNER_DESCRIPTION"
       echo "Tags:         $CI_RUNNER_TAGS"
       cat /proc/1/cmdline; echo
-      wget ipinfo.io && cat index.html; echo       
+      wget ipinfo.io && cat index.html; echo
+
+test3:
+  stage: k8s-build
+  tags:
+    - lima-k8s
+  needs: []
+  script:
+    - sleep 5
+    - |
+      echo "Building the project on $CI_RUNNER_ID ($CI_RUNNER_TAGS)"
+      echo "Runner ID:    $CI_RUNNER_ID"
+      echo "Description:  $CI_RUNNER_DESCRIPTION"
+      echo "Tags:         $CI_RUNNER_TAGS"
+      cat /proc/1/cmdline; echo
+
+test4:
+  stage: k8s-build
+  tags:
+    - lima-k8s
+  needs: []
+  script:
+    - sleep 1
+    - echo "Building the project on $CI_RUNNER_ID ($CI_RUNNER_TAGS)"
+    - |
+      echo "Runner ID:    $CI_RUNNER_ID"
+      echo "Description:  $CI_RUNNER_DESCRIPTION"
+      echo "Tags:         $CI_RUNNER_TAGS"
+      cat /proc/1/cmdline; echo
+      wget ipinfo.io && cat index.html; echo            
