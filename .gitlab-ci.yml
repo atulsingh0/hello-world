@@ -12,7 +12,6 @@ job_build:
     - ps -ef
     - curl -s ipinfo.io
     - cat /proc/1/cmdline
-    - env
     - cat /tmp/gitlab-build
 
 
