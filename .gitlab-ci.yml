@@ -7,36 +7,38 @@ stages:
 job_build:
   stage: build
   script:
-    - echo "Building the project"
-    - date | tee -a /tmp/gitlab-build
-    - hostname | tee -a /tmp/gitlab-build
-    - cat /etc/os-release
-    - ps -ef
-    - curl -s ipinfo.io
-    - cat /proc/1/cmdline
-    - cat /tmp/gitlab-build
+    - |
+      echo "Building the project"
+      date | tee -a /tmp/gitlab-build
+      hostname | tee -a /tmp/gitlab-build
+      cat /etc/os-release
+      ps -ef
+      curl -s ipinfo.io
+      cat /proc/1/cmdline; echo
+      cat /tmp/gitlab-build
 
 where-am-i:
+  stage: where-am-i
   tags:
-    - linux-arm64                    # must match a tag on your runner
+    - linux-arm64
   script:
-    - echo "Runner ID:    $CI_RUNNER_ID"
-    - echo "Description:  $CI_RUNNER_DESCRIPTION"
-    - echo "Tags:         $CI_RUNNER_TAGS"
-    - echo "Version:      $CI_RUNNER_VERSION"
-    - echo "Hostname:     $(hostname)"
-    - echo "User:         $(whoami)"
-    - echo "my-laptop-$(date +%s)-$CI_RUNNER_ID" 
-    - uname -a
+    - |
+      echo "Runner ID:    $CI_RUNNER_ID"
+      echo "Description:  $CI_RUNNER_DESCRIPTION"
+      echo "Tags:         $CI_RUNNER_TAGS"
+      echo "Hostname:     $(hostname)"
+      echo "User:         $(whoami)"
+      uname -a
+      echo "marker: my-laptop-$(date +%s)-$CI_RUNNER_ID" >> ~/gitlab-run
 
 test1:
-  stage: build
+  stage: test1
   script:
     - sleep 5
     - echo "Building the project"
 
 test2:
-  stage: build
+  stage: test2
   script:
     - sleep 5
     - echo "Building the project"        
