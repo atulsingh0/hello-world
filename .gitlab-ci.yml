@@ -1,6 +1,8 @@
 stages:
   - build
   - where-am-i
+  - test1
+  - test2 
 
 job_build:
   stage: build
@@ -16,7 +18,7 @@ job_build:
 
 where-am-i:
   tags:
-    - local                    # must match a tag on your runner
+    - linux-arm64                    # must match a tag on your runner
   script:
     - echo "Runner ID:    $CI_RUNNER_ID"
     - echo "Description:  $CI_RUNNER_DESCRIPTION"
@@ -26,3 +28,15 @@ where-am-i:
     - echo "User:         $(whoami)"
     - echo "my-laptop-$(date +%s) | $CI_RUNNER_ID " >> ~/runner-proof.txt
     - uname -a
+
+test1:
+  stage: build
+  script:
+    - sleep 5
+    - echo "Building the project"
+
+test2:
+  stage: build
+  script:
+    - sleep 5
+    - echo "Building the project"        
